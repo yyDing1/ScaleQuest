@@ -54,7 +54,7 @@ class LLMPredictor:
             enable_prefix_caching=enable_prefix_caching,
             trust_remote_code=True,
             swap_space=swap_space,
-            gpu_memory_utilization=0.98,
+            gpu_memory_utilization=0.95,
             seed=seed,
         )
         self.sampling_params = SamplingParams(

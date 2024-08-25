@@ -21,6 +21,7 @@ class ScriptArguments:
     what their capacity and features are, and what size model you want to train.
     """
 
+    task: Optional[str] = field(default="query_sft")
     per_device_train_batch_size: Optional[int] = field(default=1)
     per_device_eval_batch_size: Optional[int] = field(default=1)
     gradient_accumulation_steps: Optional[int] = field(default=4)
@@ -109,8 +110,8 @@ model = AutoModelForCausalLM.from_pretrained(
 tokenizer = AutoTokenizer.from_pretrained(
     script_args.model_path, trust_remote_code=True
 )
-# tokenizer.pad_token = tokenizer.eos_token
-# print("We set the pad token as the eos token by default....")
+tokenizer.pad_token = tokenizer.eos_token
+print("We set the pad token as the eos token by default....")
 # tokenizer.truncation_side = "left"
 tokenizer.model_max_length = script_args.max_length
 # tokenizer.chat_template = "{% set loop_messages = messages %}{% for message in loop_messages %}{% set content = '<|start_header_id|>' + message['role'] + '<|end_header_id|>\n\n'+ message['content'] | trim + '<|eot_id|>' %}{% if loop.index0 == 0 %}{% set content = bos_token + content %}{% endif %}{{ content }}{% endfor %}{% if add_generation_prompt %}{{ '<|start_header_id|>assistant<|end_header_id|>\n\n' }}{% endif %}"
@@ -120,17 +121,25 @@ dataset = load_dataset(script_args.dataset_path)
 
 
 def formatting_prompts_func(example):
-    if script_args.prompt_type == "qwen2-math":
-        messages = [
-            # {"role": "system", "content": "You are a helpful assistant."},
-            {"role": "user", "content": example["query"].strip()}
-        ]
-    else:
-        raise NotImplementedError(
-            f"Prompt type {script_args.prompt_type} not implemented."
-        )
+    if script_args.task == "query_sft": 
+        if script_args.prompt_type == "qwen2-math":
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": example["query"].strip()}
+            ]
+        elif script_args.prompt_type == "deepseek-math":
+            messages = [
+                {"role": "user", "content": example["query"].strip()}
+            ]
+        else:
+            raise NotImplementedError(
+                f"Prompt type {script_args.prompt_type} not implemented."
+            )
+    elif script_args.task == "query_response_sft":
+        pass
 
-    return {"text": tokenizer.apply_chat_template(messages, tokenize=False).strip()}
+    # return {"text": tokenizer.apply_chat_template(messages, tokenize=False).strip()}
+    return {"messages": messages}
 
 
 dataset = dataset.map(formatting_prompts_func, batched=False)
@@ -148,7 +157,6 @@ trainer = SFTTrainer(
     train_dataset=train_dataset,
     eval_dataset=eval_dataset,
     args=training_args,
-    dataset_text_field="text",
     # formatting_func=,
     max_seq_length=script_args.max_length,
     packing=True,

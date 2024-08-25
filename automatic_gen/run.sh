@@ -1,16 +1,16 @@
-# export CUDA_VISIBLE_DEVICES=6,7
+export CUDA_VISIBLE_DEVICES=6,7
 
 # Query Gen
 qry_num=1000
-qry_prompt_type="qwen2-math-qgen-sft"
-qry_model_path="/data/dyy/QueryPreference/query_sft/models/Qwen2-Math-7B-Instruct-QueryGen-sft"
+qry_prompt_type="deepseek-math"
+qry_model_path="/nvme1/dyy/QueryPreference/query_sft/models/Deepseek-Math-7B-QueryGen-sft"
 qry_temp=1.0
 qry_top_p=1.0
 
 # Response Gen
 res_num_per_query=1
-res_prompt_type="qwen2-math"
-res_model_path="/data/dyy/externel_resources/hf_models/Qwen2-Math-7B-Instruct"
+res_prompt_type="deepseek-math"
+res_model_path="/nvme1/sxy/hf_resources/hf_models/deepseek-math-7b-rl"
 res_temp=0.0
 res_top_p=1.0
 
