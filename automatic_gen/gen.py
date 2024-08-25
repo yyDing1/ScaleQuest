@@ -18,10 +18,22 @@ def get_args():
 
     # Query Generation Parameters
     parser.add_argument("--qry_gen", action="store_true")
-    parser.add_argument("--qry_num", type=int, default=1000, help="Total number of prompts to generate. If specified, repeat will be ignored.")
+    parser.add_argument(
+        "--qry_num",
+        type=int,
+        default=1000,
+        help="Total number of prompts to generate. If specified, repeat will be ignored.",
+    )
     parser.add_argument("--qry_prompt_type", type=str, default="qwen2-math")
-    parser.add_argument("--qry_model_path", type=str, default="Qwen/Qwen2-Math-1.5B-Instruct")
-    parser.add_argument("--qry_model_tp", type=int, default=1, help="Number of GPUs to use for tensor parallelism. Only used for Llama 70B models.")
+    parser.add_argument(
+        "--qry_model_path", type=str, default="Qwen/Qwen2-Math-1.5B-Instruct"
+    )
+    parser.add_argument(
+        "--qry_model_tp",
+        type=int,
+        default=1,
+        help="Number of GPUs to use for tensor parallelism. Only used for Llama 70B models.",
+    )
     # parser.add_argument("--qry_model_dtype", type=str, default="bfloat16", choices=["float16", "bfloat16"])
     parser.add_argument("--qry_temperature", type=float, default=1.0)
     parser.add_argument("--qry_top_p", type=float, default=1.0)
@@ -29,10 +41,22 @@ def get_args():
 
     # Response Generation Parameters
     parser.add_argument("--res_gen", action="store_true")
-    parser.add_argument("--res_num_per_query", type=int, default=5, help="Number of samples to generate for one time.")
+    parser.add_argument(
+        "--res_num_per_query",
+        type=int,
+        default=5,
+        help="Number of samples to generate for one time.",
+    )
     parser.add_argument("--res_prompt_type", type=str, default="qwen2-math")
-    parser.add_argument("--res_model_path", type=str, default="Qwen/Qwen2-Math-1.5B-Instruct")
-    parser.add_argument("--res_model_tp", type=int, default=1, help="Number of GPUs to use for tensor parallelism. Only used for Llama 70B models.")
+    parser.add_argument(
+        "--res_model_path", type=str, default="Qwen/Qwen2-Math-1.5B-Instruct"
+    )
+    parser.add_argument(
+        "--res_model_tp",
+        type=int,
+        default=1,
+        help="Number of GPUs to use for tensor parallelism. Only used for Llama 70B models.",
+    )
     # parser.add_argument("--res_model_dtype", type=str, default="bfloat16", choices=["float16", "bfloat16"])
     parser.add_argument("--res_temperature", type=float, default=0.0)
     parser.add_argument("--res_top_p", type=float, default=1.0)
@@ -48,7 +72,7 @@ def get_args():
 
 
 args = get_args()
-print(f"Instruction Generation Manager. Arguments: {args}") # For logging
+print(f"Instruction Generation Manager. Arguments: {args}")  # For logging
 
 if args.qry_gen:
     if "qwen2" in args.qry_prompt_type:
@@ -58,20 +82,25 @@ if args.qry_gen:
         pre_query_template = "<｜begin▁of▁sentence｜>User: "
         stop_tokens = ["<｜begin▁of▁sentence｜>", "<｜end▁of▁sentence｜>"]
     else:
-        raise NotImplementedError(f"Query prompt type {args.qry_prompt_type} is not implemented")
+        raise NotImplementedError(
+            f"Query prompt type {args.qry_prompt_type} is not implemented"
+        )
 
     # Generate Query
 
-    dataset = ray.data.from_items([
-        {
-            "query_id": query_idx,
-            "qry_gen_model": args.qry_model_path,
-            "prompt_query_gen": pre_query_template,
-            "query_gen_temp": args.qry_temperature,
-            "qry_top_p": args.qry_top_p,
-            "qry_max_tokens": args.qry_max_tokens,
-        } for query_idx in range(args.qry_num)
-    ])
+    dataset = ray.data.from_items(
+        [
+            {
+                "query_id": query_idx,
+                "qry_gen_model": args.qry_model_path,
+                "prompt_query_gen": pre_query_template,
+                "query_gen_temp": args.qry_temperature,
+                "qry_top_p": args.qry_top_p,
+                "qry_max_tokens": args.qry_max_tokens,
+            }
+            for query_idx in range(args.qry_num)
+        ]
+    )
     dataset = run_vllm_inference_distributed(
         ds=dataset,
         model_path=args.qry_model_path,
@@ -92,19 +121,26 @@ if args.qry_gen:
     def flatten_batch_and_strip(line_data):
         generation_query_list = line_data.pop("generation_query_list")
         expanded_rows = [
-            {**line_data, "query": generation_query.strip()} for generation_query in generation_query_list
+            {**line_data, "query": generation_query.strip()}
+            for generation_query in generation_query_list
         ]
         return expanded_rows
 
     dataset = dataset.flat_map(flatten_batch_and_strip, concurrency=4)
-    qry_gen_output_path = os.path.join(args.output_folder, f"{args.qry_prompt_type}_querygen{args.qry_num}_temp{args.qry_temperature}_topp{args.qry_top_p}")
+    qry_gen_output_path = os.path.join(
+        args.output_folder,
+        f"{args.qry_prompt_type}_querygen{args.qry_num}_temp{args.qry_temperature}_topp{args.qry_top_p}",
+    )
     dataset.write_json(qry_gen_output_path)
 
 # Generate Response
 
 if args.res_gen:
     time.sleep(30)  # wait for the GPU resources to be released
-    qry_gen_output_path = os.path.join(args.output_folder, f"{args.qry_prompt_type}_querygen{args.qry_num}_temp{args.qry_temperature}_topp{args.qry_top_p}")
+    qry_gen_output_path = os.path.join(
+        args.output_folder,
+        f"{args.qry_prompt_type}_querygen{args.qry_num}_temp{args.qry_temperature}_topp{args.qry_top_p}",
+    )
     dataset = ray.data.read_json(qry_gen_output_path)
 
     if args.res_prompt_type == "qwen2-math":
@@ -121,7 +157,9 @@ if args.res_gen:
         )
         stop_tokens = ["<｜begin▁of▁sentence｜>", "<｜end▁of▁sentence｜>"]
     else:
-        raise NotImplementedError(f"Response prompt type {args.res_prompt_type} is not implemented")
+        raise NotImplementedError(
+            f"Response prompt type {args.res_prompt_type} is not implemented"
+        )
 
     def preprocess_response_template(line_data):
         prompt_res_gen = res_generation_template.format(input=line_data["query"])
@@ -135,7 +173,8 @@ if args.res_gen:
             }
         )
         expanded_rows = [
-            {**line_data, "sample_idx": sample_idx} for sample_idx in range(args.res_num_per_query)
+            {**line_data, "sample_idx": sample_idx}
+            for sample_idx in range(args.res_num_per_query)
         ]
         return expanded_rows
 
@@ -162,5 +201,8 @@ if args.res_gen:
 
     dataset = dataset.map(strip_data, concurrency=4)
 
-    res_gen_output_path = os.path.join(args.output_folder, f"{args.res_prompt_type}_resgen{args.qry_num}x{args.res_num_per_query}_temp{args.res_temperature}_topp{args.res_top_p}")
+    res_gen_output_path = os.path.join(
+        args.output_folder,
+        f"{args.res_prompt_type}_resgen{args.qry_num}x{args.res_num_per_query}_temp{args.res_temperature}_topp{args.res_top_p}",
+    )
     dataset.write_json(res_gen_output_path)

@@ -21,18 +21,6 @@ class ScriptArguments:
     what their capacity and features are, and what size model you want to train.
     """
 
-    local_rank: Optional[int] = field(default=-1, metadata={"help": "Used for multi-gpu"})
-    resume_from_checkpoint: Optional[bool] = field(
-        default=False,
-        metadata={"help": "If you want to resume training where it left off."},
-    )
-    deepspeed: Optional[str] = field(
-        default=None,
-        metadata={
-            "help": "Path to deepspeed config if using deepspeed. \
-            You may need this if the model that you want to train doesn't fit on a single GPU."
-        },
-    )
     per_device_train_batch_size: Optional[int] = field(default=1)
     per_device_eval_batch_size: Optional[int] = field(default=1)
     gradient_accumulation_steps: Optional[int] = field(default=4)
@@ -78,7 +66,9 @@ class ScriptArguments:
         metadata={"help": "The lr scheduler"},
     )
 
-    max_training_samples: Optional[int] = field(default=-1, metadata={"help": "the maximum sample size"})
+    max_training_samples: Optional[int] = field(
+        default=-1, metadata={"help": "the maximum sample size"}
+    )
 
     max_length: Optional[int] = field(default=4096)
     output_dir: Optional[str] = field(default="./models/sft_model_llama3")
@@ -99,8 +89,6 @@ training_args = TrainingArguments(
     eval_strategy="epoch",
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     gradient_checkpointing=script_args.gradient_checkpointing,
-    deepspeed=script_args.deepspeed,
-    local_rank=script_args.local_rank,
     remove_unused_columns=True,
     bf16=script_args.bf16,
     logging_strategy="steps",
@@ -112,11 +100,15 @@ training_args = TrainingArguments(
 )
 
 
-
 model = AutoModelForCausalLM.from_pretrained(
-    script_args.model_path, torch_dtype=torch.bfloat16, use_flash_attention_2=True, trust_remote_code=True
+    script_args.model_path,
+    torch_dtype=torch.bfloat16,
+    use_flash_attention_2=True,
+    trust_remote_code=True,
 ).to("cuda")
-tokenizer = AutoTokenizer.from_pretrained(script_args.model_path, trust_remote_code=True)
+tokenizer = AutoTokenizer.from_pretrained(
+    script_args.model_path, trust_remote_code=True
+)
 # tokenizer.pad_token = tokenizer.eos_token
 # print("We set the pad token as the eos token by default....")
 # tokenizer.truncation_side = "left"
@@ -126,6 +118,7 @@ tokenizer.model_max_length = script_args.max_length
 
 dataset = load_dataset(script_args.dataset_path)
 
+
 def formatting_prompts_func(example):
     if script_args.prompt_type == "qwen2-math":
         messages = [
@@ -133,7 +126,9 @@ def formatting_prompts_func(example):
             {"role": "user", "content": example["query"].strip()}
         ]
     else:
-        raise NotImplementedError(f"Prompt type {script_args.prompt_type} not implemented.")
+        raise NotImplementedError(
+            f"Prompt type {script_args.prompt_type} not implemented."
+        )
 
     return {"text": tokenizer.apply_chat_template(messages, tokenize=False).strip()}
 
