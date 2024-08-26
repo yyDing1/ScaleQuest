@@ -1,5 +1,3 @@
-export CUDA_VISIBLE_DEVICES=6,7
-
 ACCELERATE_LOG_LEVEL=info accelerate launch \
 --config_file ./zero3.yaml \
 train.py \
@@ -12,5 +10,5 @@ train.py \
     --output_dir models/Deepseek-Math-7B-QueryGen-sft-maxlen-1024 \
     --per_device_train_batch_size 1 \
     --per_device_eval_batch_size 1 \
-    --gradient_accumulation_steps 16 \
+    --gradient_accumulation_steps 4 \
 
