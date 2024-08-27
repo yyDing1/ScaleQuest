@@ -162,3 +162,5 @@ automatic_gen/data/
 query_sft/models/
 query_sft/data/
 dart-math/
+evaluation/code/
+evaluation/outputs/
