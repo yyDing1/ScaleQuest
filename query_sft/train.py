@@ -136,8 +136,21 @@ def formatting_prompts_func(example):
                 f"Prompt type {script_args.prompt_type} not implemented."
             )
     elif script_args.task == "query_response_sft":
-        pass
-
+        if script_args.prompt_type == "qwen2-math":
+            messages = [
+                {"role": "system", "content": "You are a helpful assistant."},
+                {"role": "user", "content": example["query"].strip()},
+                {"role": "assistant", "content": example["response"].strip()},
+            ]
+        elif script_args.prompt_type == "deepseek-math":
+            messages = [
+                {"role": "user", "content": example["query"].strip()},
+                {"role": "assistant", "content": example["response"].strip()},
+            ]
+        else:
+            raise NotImplementedError(
+                f"Prompt type {script_args.prompt_type} not implemented."
+            )
     # return {"text": tokenizer.apply_chat_template(messages, tokenize=False).strip()}
     return {"messages": messages}
 
