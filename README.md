@@ -55,3 +55,19 @@ gpu_ids="0,1,2,3,4,5,6,7"
 output_dir="outputs/Deepseek-MathGen-Sft-Dpo-140K"
 ```
 
+## Step 3: 评估模型的能力
+
+```bash
+cd evaluation && bash scripts/math_eval.sh
+```
+
+需要设置一些参数：
+
+```bash
+PROMPT_TYPE=deepseek-math
+MODEL_NAME_OR_PATH=/path/to/your/model
+OUTPUT_DIR=outputs
+
+# 需要评估的benchmark
+DATA_NAME="gsm8k,math"
+```
