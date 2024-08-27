@@ -66,10 +66,9 @@ cd evaluation && bash scripts/math_eval.sh
 
 ```bash
 PROMPT_TYPE=deepseek-math
-MODEL_NAME_OR_PATH=/data/dyy/dart-math/outputs/dart-math-deepseek-7b-Qwen2-MathGen-140K/checkpoint-1250
+MODEL_NAME_OR_PATH=/path/to/your/model
 OUTPUT_DIR=outputs
 
-# 需要评估的 benchmark
+# 需要评估的benchmark
 DATA_NAME="gsm8k,math"
 ```
-

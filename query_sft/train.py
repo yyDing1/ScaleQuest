@@ -48,6 +48,9 @@ class ScriptArguments:
             "help": "This essentially cuts the training time in half if you want to sacrifice a little precision and have a supported GPU."
         },
     )
+    tf32: Optional[bool] = field(
+        default=None,
+    )
     num_train_epochs: Optional[float] = field(
         default=1,
         metadata={"help": "The number of training epochs for the reward model."},
@@ -92,6 +95,7 @@ training_args = TrainingArguments(
     gradient_checkpointing=script_args.gradient_checkpointing,
     remove_unused_columns=True,
     bf16=script_args.bf16,
+    tf32=script_args.tf32,
     logging_strategy="steps",
     logging_steps=1,
     optim=script_args.optim,
