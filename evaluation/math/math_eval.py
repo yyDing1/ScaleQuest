@@ -82,7 +82,7 @@ def prepare_data(data_name, args):
 
     # get out_file name
     dt_string = datetime.now().strftime("%m-%d_%H-%M")
-    model_name = args.model_name_or_path.split("/")[-1]
+    model_name = "/".join(args.model_name_or_path.split("/")[-2:]) if "checkpoint" in args.model_name_or_path else args.model_name_or_path.split("/")[-1]
     out_file_prefix = f"{args.split}_{args.prompt_type}_{args.num_test_sample}_seed{args.seed}_t{args.temperature}"
     output_dir = args.output_dir
     out_file = f"{output_dir}/{model_name}/{data_name}/{out_file_prefix}.jsonl"
