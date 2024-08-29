@@ -1,9 +1,9 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 # Query Gen
-qry_num=1000
-qry_prompt_type="deepseek-math-sft-optim"
-qry_model_path="/nvme1/dyy/QueryPreference/query_sft/models/Deepseek-Math-7B-QueryGen-sft-optim"
+qry_num=200000
+qry_prompt_type="deepseek-math-sft"
+qry_model_path="/nvme1/dyy/QueryPreference/query_sft/models/Deepseek-Math-7B-QueryGen-sft"
 qry_temp=1.0
 qry_top_p=1.0
 
@@ -17,6 +17,7 @@ res_top_p=1.0
 output_folder="data/"
 
 python gen.py \
+    --qry_gen \
     --qry_num $qry_num \
     --qry_prompt_type $qry_prompt_type \
     --qry_model_path $qry_model_path \
