@@ -199,7 +199,12 @@ if args.res_gen:
         line_data["response"] = line_data["response"][0].strip()
         return line_data
 
-    dataset = dataset.map(strip_data, concurrency=4)
+    def filter_data(line_data):
+        response = line_data["response"]
+        has_answer = "boxed" in response or "he answer is" in response or "final answer is" in response
+        return has_answer
+
+    dataset = dataset.map(strip_data, concurrency=4).filter(filter_data, concurrency=4)
 
     res_gen_output_path = os.path.join(
         args.output_folder,

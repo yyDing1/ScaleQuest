@@ -1,23 +1,22 @@
-export CUDA_VISIBLE_DEVICES=0,1,2,3
+export CUDA_VISIBLE_DEVICES=0,1,2,3,4,5
 
 # Query Gen
 qry_num=1000
-qry_prompt_type="deepseek-math-sft-optim-alignment"
-qry_model_path="/data/dyy/alignment-handbook/output/Deepseek-Math-RL-QueryGen-Optim-sft-lr5e-5-epoch1"
+qry_prompt_type="deepseek-math-sft-optim"
+qry_model_path="/nvme1/dyy/QueryPreference/query_sft/models/Deepseek-Math-7B-QueryGen-sft-optim"
 qry_temp=1.0
 qry_top_p=1.0
 
 # Response Gen
 res_num_per_query=1
 res_prompt_type="deepseek-math-rl"
-res_model_path="/data/dyy/externel_resources/hf_models/deepseek-math-7b-rl"
+res_model_path="/nvme1/sxy/hf_resources/hf_models/deepseek-math-7b-rl/"
 res_temp=0.0
 res_top_p=1.0
 
 output_folder="data/"
 
 python gen.py \
-    --qry_gen \
     --qry_num $qry_num \
     --qry_prompt_type $qry_prompt_type \
     --qry_model_path $qry_model_path \
