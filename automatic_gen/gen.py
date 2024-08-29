@@ -143,14 +143,14 @@ if args.res_gen:
     )
     dataset = ray.data.read_json(qry_gen_output_path)
 
-    if args.res_prompt_type == "qwen2-math":
+    if "qwen2-math" in args.res_prompt_type:
         res_generation_template = (
             "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
             "<|im_start|>user\n{input}\nPlease reason step by step, and put your final answer within \\boxed{{}}.<|im_end|>\n"
             "<|im_start|>assistant\n"
         )
         stop_tokens = ["<|im_start|>", "<|im_end|>", "<|endoftext|>"]
-    elif args.res_prompt_type == "deepseek-math":
+    elif "deepseek-math" in args.res_prompt_type:
         res_generation_template = (
             "<｜begin▁of▁sentence｜>User: {input}\nPlease reason step by step, "
             "and put your final answer within \\boxed{{}}.\n\nAssistant:"

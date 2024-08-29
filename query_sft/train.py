@@ -90,7 +90,7 @@ training_args = TrainingArguments(
     num_train_epochs=script_args.num_train_epochs,
     weight_decay=script_args.weight_decay,
     save_strategy="epoch",
-    eval_strategy="epoch",
+    eval_strategy="no",
     gradient_accumulation_steps=script_args.gradient_accumulation_steps,
     gradient_checkpointing=script_args.gradient_checkpointing,
     remove_unused_columns=True,
@@ -141,15 +141,17 @@ def formatting_prompts_func(example):
             )
     elif script_args.task == "query_response_sft":
         if script_args.prompt_type == "qwen2-math":
+            query_template = "{input}\nPlease reason step by step, and put your final answer within \\boxed{{}}."
             messages = [
                 {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": example["query"].strip()},
-                {"role": "assistant", "content": example["response"].strip()},
+                {"role": "user", "content": query_template.format(input=example["query"].strip())},
+                {"role": "assistant", "content": example["response"]},
             ]
         elif script_args.prompt_type == "deepseek-math":
+            query_template = "{input}\nPlease reason step by step, and put your final answer within \\boxed{{}}."
             messages = [
-                {"role": "user", "content": example["query"].strip()},
-                {"role": "assistant", "content": example["response"].strip()},
+                {"role": "user", "content": query_template.format(input=example["query"].strip())},
+                {"role": "assistant", "content": example["response"]},
             ]
         else:
             raise NotImplementedError(
@@ -161,7 +163,7 @@ def formatting_prompts_func(example):
 
 dataset = dataset.map(formatting_prompts_func, batched=False)
 train_dataset = dataset["train"]
-eval_dataset = dataset["test"]
+eval_dataset = dataset["test"] if "test" in dataset else None
 if script_args.max_training_samples > 0:
     train_dataset = train_dataset.select(range(script_args.max_training_samples))
 

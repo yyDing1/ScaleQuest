@@ -1,16 +1,16 @@
-# export CUDA_VISIBLE_DEVICES=6,7
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
 # Query Gen
-qry_num=800000
-qry_prompt_type="qwen2-math-sft"
-qry_model_path="/nvme1/dyy/QueryPreference/query_sft/models/Qwen2-Math-7B-Instruct-QueryGen-sft"
+qry_num=1000
+qry_prompt_type="deepseek-math-sft-optim-alignment"
+qry_model_path="/data/dyy/alignment-handbook/output/Deepseek-Math-RL-QueryGen-Optim-sft-lr5e-5-epoch1"
 qry_temp=1.0
 qry_top_p=1.0
 
 # Response Gen
 res_num_per_query=1
-res_prompt_type="qwen2-math"
-res_model_path="/nvme1/dyy/externel_resources/hf_models/Qwen2-Math-7B-Instruct"
+res_prompt_type="deepseek-math-rl"
+res_model_path="/data/dyy/externel_resources/hf_models/deepseek-math-7b-rl"
 res_temp=0.0
 res_top_p=1.0
 

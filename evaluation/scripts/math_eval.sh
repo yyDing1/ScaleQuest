@@ -1,9 +1,9 @@
 set -ex
 
-export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
+export CUDA_VISIBLE_DEVICES="0,1,2,3"
 
 PROMPT_TYPE=deepseek-math
-MODEL_NAME_OR_PATH=/data/dyy/dart-math/outputs/dart-math-deepseek-7b-Qwen2-MathGen-140K/checkpoint-1250
+MODEL_NAME_OR_PATH=/data/dyy/QueryPreference/query_sft/models/Deepseek-Math-7B-QAGen-sft
 OUTPUT_DIR=outputs
 
 SPLIT="test"

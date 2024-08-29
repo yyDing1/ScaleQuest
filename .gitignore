@@ -164,4 +164,5 @@ query_sft/data/
 dart-math/
 evaluation/code/
 evaluation/outputs/
+evol_instruct/output
 temp.py
