@@ -19,7 +19,6 @@ ninja>=1.11.1
 pebble
 ipython
 ray
-flash-attn
 
 bitsandbytes==0.42.0
 black>=24.4.2
