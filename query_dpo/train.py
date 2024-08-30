@@ -239,7 +239,7 @@ if __name__ == "__main__":
 
     # 2. Load the Stack-exchange paired dataset
     dataset = load_dataset(script_args.dataset_path, split="train").train_test_split(test_size=100)
-    train_dataset = dataset["train"].map(process_dataset, num_proc=4)
+    train_dataset = dataset["train"].map(process_dataset)
     # train_dataset = train_dataset.map(process_dataset)
     # train_dataset = prepare_data(
     #     dataset=train_dataset,
@@ -254,7 +254,7 @@ if __name__ == "__main__":
         train_dataset = train_dataset.select(range(script_args.max_training_samples))
 
     # 3. Load evaluation dataset
-    eval_dataset = dataset["test"].map(process_dataset, num_proc=4)
+    eval_dataset = dataset["test"].map(process_dataset)
     # eval_dataset = prepare_data(
     #     dataset=eval_dataset,
     #     sanity_check=True,
@@ -267,7 +267,7 @@ if __name__ == "__main__":
     training_args = DPOConfig(
         per_device_train_batch_size=script_args.per_device_train_batch_size,
         per_device_eval_batch_size=script_args.per_device_eval_batch_size,
-        max_steps=script_args.max_steps,
+        # max_steps=script_args.max_steps,
         num_train_epochs=script_args.num_train_epochs,
         save_strategy=script_args.save_strategy,
         logging_steps=script_args.logging_steps,
@@ -281,7 +281,7 @@ if __name__ == "__main__":
         report_to=script_args.report_to,
         lr_scheduler_type=script_args.lr_scheduler_type,
         warmup_steps=script_args.warmup_steps,
-        optim=script_args.optimizer_type,
+        # optim=script_args.optimizer_type,
         bf16=True,
         remove_unused_columns=False,
         run_name=script_args.run_name,

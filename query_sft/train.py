@@ -145,13 +145,13 @@ def formatting_prompts_func(example):
             messages = [
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": query_template.format(input=example["query"].strip())},
-                {"role": "assistant", "content": example["response"]},
+                {"role": "assistant", "content": example["response"].strip()},
             ]
         elif script_args.prompt_type == "deepseek-math":
             query_template = "{input}\nPlease reason step by step, and put your final answer within \\boxed{{}}."
             messages = [
                 {"role": "user", "content": query_template.format(input=example["query"].strip())},
-                {"role": "assistant", "content": example["response"]},
+                {"role": "assistant", "content": example["response"].strip()},
             ]
         else:
             raise NotImplementedError(

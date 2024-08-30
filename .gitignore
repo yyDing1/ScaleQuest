@@ -161,6 +161,7 @@ cython_debug/
 automatic_gen/data/
 query_sft/models/
 query_sft/data/
+query_dpo/models
 dart-math/
 evaluation/code/
 evaluation/outputs/
