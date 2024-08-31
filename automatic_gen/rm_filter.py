@@ -1,6 +1,8 @@
 import os
 from datasets import load_dataset
-from compute_reward_score import generate_score
+from rm_score import run_rm_score_distributed
+import ray
+import ray.data
 
 
 def filter_data_based_on_final_answer(line_data):
@@ -9,16 +11,17 @@ def filter_data_based_on_final_answer(line_data):
     return has_answer
 
 
-data_dir = "/nvme1/dyy/QueryPreference/automatic_gen/data/deepseek-math-rl_resgen200000x1_temp0.0_topp1.0"
-rm_path = "/nvme1/dyy/externel_resources/hf_models/FsfairX-Gemma2-RM-v0.1"
+data_dir = "/data/dyy/QueryPreference/automatic_gen/data/deepseek-math-rl_resgen200000x1_temp0.0_topp1.0"
+save_dir = "/data/dyy/QueryPreference/automatic_gen/rm_filter_data/deepseek-math-rl_resgen200000x1_temp0.0_topp1.0"
+rm_path = "/data/dyy/externel_resources/hf_models/internlm2-7b-reward"
 
-for data_file in os.listdir(data_dir):
-    data_path = os.path.join(data_dir, data_file)
-    print(f"Processing {data_path}")
-    raw_data = load_dataset("json", data_files=data_path, split="train").select(range(100))
-    processed_data = generate_score(raw_data, model_path=rm_path, tokenizer_path=rm_path)
-    import pdb; pdb.set_trace()
-    # filtered_data = raw_data.filter(filter_data_based_on_final_answer)
-    # print(len(filtered_data) / len(raw_data))
-    # filtered_data.to_json(data_path)
+
+dataset = ray.data.read_json(data_dir)
+dataset = run_rm_score_distributed(
+    dataset,
+    model_path=rm_path,
+    tokenizer_path=rm_path,
+)
+dataset.write_json(save_dir)
+
 
