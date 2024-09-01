@@ -117,15 +117,13 @@ if __name__ == "__main__":
     rm_path = "/data/dyy/externel_resources/hf_models/ArmoRM-Llama3-8B-v0.1"
     rm_model = rm_path.split("/")[-1]
 
-    save_dir = f"/data/sxy/query_preference/automatic_gen/rm_scored_data/{rm_model}/{data_name}/output.jsonl"
+    save_dir = f"/data/sxy/QueryPreference/automatic_gen/rm_scored_data/{rm_model}/{data_name}/output.jsonl"
 
-    batch_size = 8
     ds = load_dataset(data_dir, split="train")
     ds = generate_score_parallel(
         ds,
         model_path=rm_path,
         tokenizer_path=rm_path,
         num_gpus=os.getenv("CUDA_VISIBLE_DEVICES").count(",") + 1,
-        batch_size=batch_size,
     )
     ds.to_json(save_dir)
