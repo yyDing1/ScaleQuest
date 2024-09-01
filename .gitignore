@@ -168,4 +168,4 @@ evaluation/outputs/
 evol_instruct/output
 temp.py
 automatic_gen/rm_filtered_data
-automatic_gen/rm_filtered_data
+automatic_gen/rm_scored_data
