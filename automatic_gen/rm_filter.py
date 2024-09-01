@@ -1,10 +1,8 @@
 import os
-os.environ["CUDA_VISIBLE_DEVICES"] = "0,1,2,3,4,5,6,7"
 from datasets import load_dataset
-from rm_score import generate_score_parallel
 
 
-def filter_data_based_on_final_answer(line_data):
+def filter_data(line_data):
     response = line_data["response"]
     has_answer = (
         "boxed" in response
@@ -14,17 +12,33 @@ def filter_data_based_on_final_answer(line_data):
     return has_answer
 
 
-if __name__ == "__main__":
-    data_dir = "/data/dyy/QueryPreference/automatic_gen/data/deepseek-math-rl_resgen200000x1_temp0.0_topp1.0"
-    data_name = data_dir.split("/")[-1]
+### Step1: Filter data without final answer
 
-    rm_path = "/data/dyy/externel_resources/hf_models/ArmoRM-Llama3-8B-v0.1"
-    rm_model = rm_path.split("/")[-1]
+# data_dir = "/data/dyy/QueryPreference/automatic_gen/data/deepseek-math-rl_resgen120000x1_temp0.0_topp1.0"
 
-    save_dir = f"/data/sxy/query_preference/automatic_gen/rm_filter_data/{rm_model}/{data_name}/output.jsonl"
+# for data_file in os.listdir(data_dir):
+#     data_path = os.path.join(data_dir, data_file)
+#     raw_data = load_dataset("json", data_files=data_path, split="train")
+#     filtered_data = raw_data.filter(filter_data)
+#     print(len(filtered_data) / len(raw_data))
+#     filtered_data.to_json(data_path)
 
-    ds = load_dataset(data_dir, split="train")
-    ds = generate_score_parallel(
-        ds, model_path=rm_path, tokenizer_path=rm_path, num_gpus=os.getenv("CUDA_VISIBLE_DEVICES").count(",") + 1
-    )
-    ds.to_json(save_dir)
+
+### Step2: Filter data based on score
+
+data_dir = "/data/sxy/QueryPreference/automatic_gen/rm_scored_data/internlm2-7b-reward/deepseek-math-rl_resgen200000x1_temp0.0_topp1.0/output.jsonl"
+data_name = data_dir.split("/")[-2]
+model_name = data_dir.split("/")[-3]
+score = 2
+
+ds = load_dataset("json", data_files=data_dir, split="train")
+
+ds = ds.filter(lambda x: x["score"] > score)
+# ds = ds.sort("score", reverse=True).select(range(90000)).shuffle(seed=42)
+ds_count = len(ds)
+
+data_name = data_name.replace("200000", str(ds_count))
+output_dir = f"/data/sxy/QueryPreference/automatic_gen/rm_filtered_data/{model_name}/{data_name}_score{score}"
+
+os.makedirs(output_dir, exist_ok=True)
+ds.to_json(f"{output_dir}/train.jsonl")
