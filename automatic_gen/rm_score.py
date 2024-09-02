@@ -76,7 +76,7 @@ def process_data_on_device(dataset, score_model_path, score_tokenizer, gpu_id):
             {"role": "assistant", "content": line_data["response"]},
         ]
         score = model(chat_messages) if "ArmoRM" in score_model_path else model.get_score(score_tokenizer, chat_messages)
-        line_data["score"] = score["score"]
+        line_data["score"] = score["score"] if "ArmoRM" in score_model_path else score
         line_data["reward_model"] = score_model_path
         all_data.append(line_data)
 
@@ -115,6 +115,7 @@ if __name__ == "__main__":
     data_name = data_dir.split("/")[-1]
 
     rm_path = "/data/dyy/externel_resources/hf_models/ArmoRM-Llama3-8B-v0.1"
+    rm_path = "/data/dyy/externel_resources/hf_models/internlm2-7b-reward"
     rm_model = rm_path.split("/")[-1]
 
     save_dir = f"/data/sxy/QueryPreference/automatic_gen/rm_scored_data/{rm_model}/{data_name}/output.jsonl"
