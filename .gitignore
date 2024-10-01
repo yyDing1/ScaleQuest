@@ -168,3 +168,6 @@ evaluation/outputs/
 evol_instruct/output
 temp.py
 automatic_gen/*data
+baselines
+check_solvability_difficulty
+test_rm
