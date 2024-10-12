@@ -4,11 +4,14 @@
 <p align="center">
     <a href="https://github.com/yyDing1/ScaleQuest/blob/main/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/yyDing1/ScaleQuest"></a>
     <a href="https://huggingface.co/collections/dyyyyyyyy/scalequest-670a7dc2623c91990f28913b"><img alt="Pretrained Models" src="https://img.shields.io/badge/🤗 HuggingFace-Data & Models-green"></a>
+    <a href="https://scalequest.github.io/"><img alt="Blog" src="https://img.shields.io/badge/📒-Blog Post-blue"></a>
     <a href=""><img alt="Paper" src="https://img.shields.io/badge/📄-Paper-orange"></a>
     <a href="https://opennlg.cn/"><img src="https://img.shields.io/badge/Organization-OpenNLG%20Group-blueviolet"></a>
 </p>
 
 We introduce ScaleQuest, a scalable, cost-effective, and novel data synthesis method that utilizes small-size open-source models to generate questions from scratch without the need for seed data with complex augmentation constraints.
+
+![](img/results.png)
 
 This repository contains our complete data synthesis method, including:
 
@@ -25,8 +28,5 @@ We randomly sampled 100 generated data points and placed them in `data_samples/s
 
 ![](img/method.png)
 
-## Model Performance
-
-![](img/results.png)
 
 
