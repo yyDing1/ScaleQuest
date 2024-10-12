@@ -1,74 +1,22 @@
-# QueryPreference
+# ScaleQuest
 
-```bash
-conda create -n querypref python=3.11
-pip install -r requirements.txt
-cd dart-math && pip install -e .
-pip install flash-attn --no-build-isolation
-```
+This repository contains our complete data synthesis method, including:
 
-## Step 1: 数据生成
+1. Training a question generator through question fine-tuning (code in the `qft_train` folder).
+2. Constructing preference data (code in the `question_optim` folder) and performing question preference optimization (code in the `qpo_train` folder).
+3. Using the trained question generator to synthesize questions (code in the `data_generation` folder).
+4. Applying a filtering process to the generated questions (code in the `question_filtering` folder).
+5. Generating responses (code in the `data_generation` folder) and applying a reward filtering strategy (code in the `reward_filtering` folder).
+6. For instruction-tuning and evaluation, we directly use the DART-Math framework.
 
-```bash
-cd automatic_gen && bash run.sh
-```
+We randomly sampled 100 generated data points and placed them in `data_samples/samples.jsonl`
 
-需要设置一些参数：
+## Method Overview
 
-```bash
-# Query Gen
-qry_num=1000
-qry_prompt_type="deepseek-math"
-qry_model_path="/path/to/QueryPreference/query_sft/models/Deepseek-Math-7B-QueryGen-sft"
-qry_temp=1.0
-qry_top_p=1.0
+![](img/method.png)
 
-# Response Gen
-res_num_per_query=1
-res_prompt_type="deepseek-math"
-res_model_path="/path/to/hf_models/deepseek-math-7b-rl"
-res_temp=0.0
-res_top_p=1.0
-```
+## Model Performance
 
-## Step 2: 用生成的数据微调
+![](img/results.png)
 
-```bash
-cd dart-math && bash scripts/train-single-node.sh
-```
 
-需要修改的参数：
-
-```bash
-# 需要改的参数
-# data_path: 刚才生成的 dataset 文件夹
-# model_path: 需要微调的 base 模型
-# output_dir: 然后改一下输出的路径
-data_path=""
-query_field="query"
-resp_field="response"
-model_path="/path/to/hf_models/deepseek-math-7b-base/"
-lr="5e-5"
-bs=64
-n_grad_acc_steps=8
-n_epochs=3
-gpu_ids="0,1,2,3,4,5,6,7"
-output_dir="outputs/Deepseek-MathGen-Sft-Dpo-140K"
-```
-
-## Step 3: 评估模型的能力
-
-```bash
-cd evaluation && bash scripts/math_eval.sh
-```
-
-需要设置一些参数：
-
-```bash
-PROMPT_TYPE=deepseek-math
-MODEL_NAME_OR_PATH=/path/to/your/model
-OUTPUT_DIR=outputs
-
-# 需要评估的benchmark
-DATA_NAME="gsm8k,math"
-```
