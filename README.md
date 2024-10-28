@@ -40,7 +40,7 @@ pip install flash-attn --no-build-isolation
 
 ## Demo Usage
 
-Below is an question generator exmaple using `ScaleQuest-Qwen2-Math-7B-QGen`
+Below is a question generator exmaple using `ScaleQuest-Qwen2-Math-7B-QGen`
 ```python
 from vllm import LLM, SamplingParams
 
