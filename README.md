@@ -1,3 +1,5 @@
+
+
 <p align="center">
 <h1 align="center">Unleashing Reasoning Capability of LLMs<br>via Scalable Question Synthesis from Scratch</h1>
 
@@ -17,8 +19,8 @@ We release two question generator models and four problem-solving models.
 
 | Model | Type | MATH | Olympiad Bench | 🤗 HuggingFace<br />Download Link |
 | - | :-: | :-: | :-: | :-: |
-| ScaleQuest-DeepSeekMath-7B-QGen | question generator | - | - | [link](https://huggingface.co/dyyyyyyyy/ScaleQuest-DeepSeekMath-7B-QGen)
-| ScaleQuest-Qwen2-Math-7B-QGen | question generator | - | - | [link](https://huggingface.co/dyyyyyyyy/ScaleQuest-Qwen2-Math-7B-QGen)
+| ScaleQuest-DeepSeekMath-7B-QGen | question generator | - | - | [link](https://huggingface.co/dyyyyyyyy/ScaleQuest-DeepSeekMath-7B-QGen) |
+| ScaleQuest-Qwen2-Math-7B-QGen | question generator | - | - | [link](https://huggingface.co/dyyyyyyyy/ScaleQuest-Qwen2-Math-7B-QGen) |
 | Mistral-7B-ScaleQuest | problem solver | 62.9 | 26.8 | [link](https://huggingface.co/dyyyyyyyy/Mistral-7B-ScaleQuest) |
 | Llama3-8B-ScaleQuest | problem solver | 64.4 | 25.3 | [link](https://huggingface.co/dyyyyyyyy/Llama3-8B-ScaleQuest) |
 | DeepSeekMath-7B-ScaleQuest | problem solver | 66.6 | 29.9 | [link](https://huggingface.co/dyyyyyyyy/DeepSeekMath-7B-ScaleQuest) |
@@ -45,8 +47,8 @@ Below is an question generator exmaple using `ScaleQuest-Qwen2-Math-7B-QGen`
 from vllm import LLM, SamplingParams
 
 model_name = "dyyyyyyyy/ScaleQuest-Qwen2-Math-7B-QGen"
-pre_query_template = "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\n"
-stop_tokens = ["<|im_start|>", "<|im_end|>", "<|endoftext|>"]
+pre_query_template = "с system\nYou are a helpful assistant.\n\n</s>\n<|User|>"
+stop_tokens = ["</s>", "\n\n", "User:"]
 llm = LLM(
     model=model_name,
     tokenizer=model_name,
@@ -93,14 +95,14 @@ tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 question = "Find the value of $x$ that satisfies the equation $4x+5 = 6x+7$."
 
-sys_prompt = "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n"
-query_prompt = "<|im_start|>user" + "\n"
+sys_prompt = "с system\nYou are a helpful assistant.\n\n</s>"
+query_prompt = "<|User|>" + "\n"
 # {query}
-prompt_after_query = "\n" + "Please reason step by step, and put your final answer within \\boxed{}.<|im_end|>" + "\n"
-resp_prompt = "<|im_start|>assistant" + "\n"
+prompt_after_query = "\n" + "Please reason step by step, and put your final answer within \\boxed{}.\n\n</s>" + "\n"
+resp_prompt = "<|Assistant|>" + "\n"
 prompt_before_resp = ""
 # {resp}
-delim = "<|im_end|>" + "\n"
+delim = "\n\n</s>" + "\n"
 
 prefix_prompt = f"{query_prompt}{question}{prompt_after_query}{resp_prompt}{prompt_before_resp}".rstrip(" ")
 full_prompt = sys_prompt + delim.join([prefix_prompt])
